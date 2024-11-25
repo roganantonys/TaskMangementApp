@@ -5,26 +5,22 @@ import Swiper from "react-native-swiper";
 type Props = {
   description: string;
   title: string;
-  url: any;
+  url: object;
 };
 
 const SwiperComponent = ({ url, title, description }: Props) => {
   return (
-    <Swiper>
-      <View className="flex-[1] mt-10">
-        <View className="h-[60%] items-center justify-center">
-          <Image source={url} style={styles.image} resizeMode="contain" />
-        </View>
-        <View className="flex-[1] bg-[#A1EEBD]">
-          <Text className="text-2xl font-bold mt-5 mb-2 text-center">
-            {title}
-          </Text>
-          <Text className="text-base text-center text-black">
-            {description}
-          </Text>
-        </View>
+    <View className="flex-[1] mt-10">
+      <View className="h-[60%] items-center justify-center">
+        <Image source={url} style={styles.image} resizeMode="contain" />
       </View>
-    </Swiper>
+      <View className="flex-[1] bg-[#A1EEBD]">
+        <Text className="text-2xl font-bold mt-5 mb-2 text-center">
+          {title}
+        </Text>
+        <Text className="text-base text-center text-black">{description}</Text>
+      </View>
+    </View>
   );
 };
 
