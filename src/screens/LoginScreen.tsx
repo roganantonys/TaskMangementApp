@@ -2,7 +2,10 @@ import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { TextInput, Button, Card, Text } from "react-native-paper";
-
+import ControlledInput from "../components/ControlledInput";
+import { useForm, Controller } from "react-hook-form";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { StackProps } from "../navigation/StackNavigation";
 // Define color palette
 const colors = {
   primary: "#659287", // Main accent color
@@ -13,17 +16,20 @@ const colors = {
   textDark: "#000000",
 };
 
-type LoginScreenProps = {};
+type formData = {
+  email: string;
+  passWord: string;
+};
+type LoginScreenProps = NativeStackScreenProps<StackProps, "Login">;
 
-const LoginScreen: React.FC<LoginScreenProps> = () => {
-  const navigation = useNavigation();
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
+  const { control, handleSubmit } = useForm<formData>();
 
-  const handleLogin = () => {
+  // const navigation = useNavigation();
+
+  const handleLogin = (data: any) => {
     // Handle login logic here
-    console.log("Email:", email);
-    console.log("Password:", password);
+    console.log("loginData:", data);
   };
 
   return (
@@ -33,26 +39,34 @@ const LoginScreen: React.FC<LoginScreenProps> = () => {
       <Card style={styles.card}>
         <Card.Content>
           <Text style={styles.title}>Login</Text>
-          <TextInput
-            label="Email"
-            mode="outlined"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
+          <ControlledInput
+            name="email"
+            label="Enter your email"
+            control={control}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Enter a valid email address",
+              },
+            }}
             keyboardType="email-address"
             autoCapitalize="none"
-            style={styles.input}
-            activeOutlineColor={colors.primary}
           />
-          <TextInput
-            label="Password"
-            mode="outlined"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
+          <ControlledInput
+            name="password"
+            label="Enter your password"
+            control={control}
+            rules={{
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+            }}
             secureTextEntry
-            style={styles.input}
-            activeOutlineColor={colors.primary}
           />
-          <Pressable onPress={handleLogin} style={styles.button}>
+          <Pressable onPress={handleSubmit(handleLogin)} style={styles.button}>
             <Text style={styles.buttonText}>Login</Text>
           </Pressable>
           <Button

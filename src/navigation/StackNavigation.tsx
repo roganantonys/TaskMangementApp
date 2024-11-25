@@ -5,10 +5,14 @@ import LoginScreen from "../screens/LoginScreen";
 import SignUpScreen from "../screens/SignUpScreen";
 import AppOverViewScreen from "../screens/AppOverViewScreen";
 
-type Props = {};
+export type StackProps = {
+  OnBoarding: undefined;
+  Login: undefined;
+  SignUp: undefined;
+};
 
-const StackNavigation = (props: Props) => {
-  const stack = createNativeStackNavigator();
+const StackNavigation = () => {
+  const stack = createNativeStackNavigator<StackProps>();
   return (
     <stack.Navigator
       screenOptions={{

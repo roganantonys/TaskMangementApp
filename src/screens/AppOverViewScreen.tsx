@@ -6,10 +6,14 @@ import Button from "../components/Button";
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import LoginScreen from "./LoginScreen";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { StackProps } from "../navigation/StackNavigation";
 
 type props = {};
-const AppOverViewScreen: React.FC<props> = ({}) => {
-  const navigation = useNavigation();
+
+type AppOverViewScreen = NativeStackScreenProps<StackProps, "OnBoarding">;
+const AppOverViewScreen: React.FC<AppOverViewScreen> = ({ navigation }) => {
+  // const navigation = useNavigation();
   return (
     <>
       <View className="flex-1">

@@ -1,8 +1,11 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { KeyboardTypeOptions, Pressable, StyleSheet, View } from "react-native";
 import { TextInput, Button, Card, Text } from "react-native-paper";
-
+import { useForm, Controller } from "react-hook-form";
+import ControlledInput from "../components/ControlledInput";
+import { NativeStackScreenProps } from "@react-navigation/native-stack";
+import { StackProps } from "../navigation/StackNavigation";
 // Define color palette
 const colors = {
   primary: "#659287", // Main accent color
@@ -13,19 +16,22 @@ const colors = {
   textDark: "#000000",
 };
 
-type SignUpScreenProps = {};
+type SignUpScreenProps = NativeStackScreenProps<StackProps, "SignUp">;
 
-const SignUpScreen: React.FC<SignUpScreenProps> = () => {
-  const navigation = useNavigation();
-  const [name, setName] = useState<string>("");
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+type formType = {
+  userName: string;
+  email: string;
+  passWord: string;
+};
 
-  const handleSignUp = () => {
+const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
+  // const navigation = useNavigation();
+
+  const { control, handleSubmit } = useForm<formType>();
+
+  const handleSignUp = (data: any) => {
     // Handle signup logic here
-    console.log("Name:", name);
-    console.log("Email:", email);
-    console.log("Password:", password);
+    console.log("data:", data);
   };
 
   return (
@@ -33,34 +39,41 @@ const SignUpScreen: React.FC<SignUpScreenProps> = () => {
       <Card style={styles.card}>
         <Card.Content>
           <Text style={styles.title}>Sign Up</Text>
-          <TextInput
-            label="Name"
-            mode="outlined"
-            value={name}
-            onChangeText={(text) => setName(text)}
-            style={styles.input}
-            activeOutlineColor={colors.primary}
+          <ControlledInput
+            name="userName"
+            label="Enter your name"
+            control={control}
+            rules={{ required: "Name is required" }}
           />
-          <TextInput
-            label="Email"
-            mode="outlined"
-            value={email}
-            onChangeText={(text) => setEmail(text)}
+          <ControlledInput
+            name="email"
+            label="Enter your email"
+            control={control}
+            rules={{
+              required: "Email is required",
+              pattern: {
+                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                message: "Enter a valid email address",
+              },
+            }}
             keyboardType="email-address"
             autoCapitalize="none"
-            style={styles.input}
-            activeOutlineColor={colors.primary}
           />
-          <TextInput
-            label="Password"
-            mode="outlined"
-            value={password}
-            onChangeText={(text) => setPassword(text)}
+          <ControlledInput
+            name="password"
+            label="Enter your password"
+            control={control}
+            rules={{
+              required: "Password is required",
+              minLength: {
+                value: 6,
+                message: "Password must be at least 6 characters long",
+              },
+            }}
             secureTextEntry
-            style={styles.input}
-            activeOutlineColor={colors.primary}
           />
-          <Pressable onPress={handleSignUp} style={styles.button}>
+
+          <Pressable onPress={handleSubmit(handleSignUp)} style={styles.button}>
             <Text style={styles.buttonText}>Sign Up</Text>
           </Pressable>
           <Button
