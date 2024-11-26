@@ -30,6 +30,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const handleLogin = (data: any) => {
     // Handle login logic here
     console.log("loginData:", data);
+    navigation.replace("BottomTab");
   };
 
   return (
