@@ -6,7 +6,19 @@ import { FAB } from "react-native-paper";
 const AgendaScreen = () => {
   console.log("profile clicked");
 
-  const items = {
+  interface Event {
+    time: string;
+    title: string;
+    location: string;
+    notes: string;
+    // other fields relevant to your event
+  }
+
+  type AgendaItems = {
+    [key: string]: Event[]; // A dictionary where the key is the date string, and the value is an array of events
+  };
+
+  const items: AgendaItems = {
     "2024-11-27": [
       {
         time: "10:00 AM",
@@ -39,7 +51,7 @@ const AgendaScreen = () => {
     ],
   };
 
-  const renderAgendaItem = (item: any) => (
+  const renderAgendaItem = (item: Event) => (
     <View style={styles.item}>
       <Text style={styles.title}>{item.title}</Text>
       <Text style={styles.time}>{item.time}</Text>
