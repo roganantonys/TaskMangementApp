@@ -3,10 +3,11 @@ import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import DashboardScreen from "../screens/DashboardScreen";
 import TaskScreen from "../screens/TaskScreen";
-import ProfileScreen from "../screens/ProfileScreen";
+import AgendaScreen from "../screens/AgendaScreen";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
+import { MaterialCommunityIcons } from "@expo/vector-icons";
 
 type Props = {};
 
@@ -31,7 +32,8 @@ const BottomTabNavigation = (props: Props) => {
           shadowOffset: { width: 0, height: 2 },
           shadowOpacity: 0.25,
           shadowRadius: 4,
-          elevation: 5, // For Android shadow
+          elevation: 5,
+          overflow: "hidden",
         },
 
         // tabBarActiveTintColor: "#DEAA79",
@@ -93,11 +95,11 @@ const BottomTabNavigation = (props: Props) => {
       />
       <Tab.Screen
         name="Profile"
-        component={ProfileScreen}
+        component={AgendaScreen}
         options={{
           tabBarIcon: ({ focused }: { focused: boolean }) => (
-            <AntDesign
-              name="user"
+            <MaterialCommunityIcons
+              name={focused ? "view-agenda" : "view-agenda-outline"}
               size={focused ? 26 : 24}
               color={focused ? "#DEAA79" : "black"}
             />
@@ -110,7 +112,7 @@ const BottomTabNavigation = (props: Props) => {
                 color: focused ? "#DEAA79" : "gray",
               }}
             >
-              Profile
+              Agenda
             </Text>
           ),
         }}
