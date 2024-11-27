@@ -3,14 +3,15 @@ import { View, Text, FlatList, TouchableOpacity } from "react-native";
 
 import { task } from "../data/tasksData";
 import TaskList from "../components/TaskList";
-
+import { useSelector } from "react-redux";
 import { FAB } from "react-native-paper";
 
 type Props = {};
 
 const TaskScreen = (props: Props) => {
-  const taskData = task;
-  const allTasks = taskData.tasks;
+  // const taskData = task;
+  // const allTasks = taskData.tasks;
+  const task = useSelector((state) => state.tasks.tasks);
 
   return (
     <View className="flex-1">
@@ -21,7 +22,7 @@ const TaskScreen = (props: Props) => {
       </View>
 
       <View className="flex-1">
-        <TaskList data={allTasks} />
+        <TaskList data={task} />
       </View>
     </View>
   );

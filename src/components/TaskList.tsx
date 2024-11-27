@@ -17,8 +17,8 @@ type Props = {
 const renderTaskItem = ({ item }: { item: TaskItem }) => (
   <Card className="mb-4 rounded-lg bg-white shadow">
     <Card.Title
-      title={item.id}
-      subtitle={item.title}
+      title={item.title}
+      // subtitle={item.title}
       titleStyle={{ fontSize: 18, fontWeight: "bold" }}
       subtitleStyle={{ fontSize: 14, color: "#4B5563" }}
       right={() => (

@@ -1,8 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, Modal, TouchableOpacity, ScrollView } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DropDownPicker from "react-native-dropdown-picker";
+import { fireDB } from "../firebase";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import Toast from "react-native-toast-message";
 
 type Props = {
   modalVisible: boolean;
@@ -23,7 +26,7 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
 
   const statusOptions = [
     { label: "Yet to Start", value: "Yet to Start" },
-    { label: "Ongoing", value: "Ongoing" },
+    { label: "Ongoing", value: "OnGoing" },
     { label: "Finished", value: "Finished" },
   ];
 
@@ -46,6 +49,26 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
     };
 
     console.log("new Item:", newItem);
+
+    // sending data to firebase
+    addDoc(collection(fireDB, "tasks"), newItem)
+      .then((res) => {
+        console.log("succesfull:", res);
+        Toast.show({
+          type: "success",
+          text1: "Task added successfully", // Message for success
+          text2: "Your task has been added to the list", // Optional second line
+        });
+        closeModal();
+      })
+      .catch((error) => {
+        console.error("Error sending tasks to Firestore:", error);
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Something went wrong while adding the task",
+        });
+      });
   }
 
   return (

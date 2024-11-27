@@ -12,9 +12,9 @@ const CustomCard = ({ data }: { data: any }) => {
     return (
       <Card style={[styles.flexCard, { backgroundColor: cardBackgroundColor }]}>
         <Card.Title
-          title={data.id}
+          title={data.title}
           titleStyle={styles.cardTitle}
-          subtitle={data.title}
+          // subtitle={data.title}
         />
         <Card.Content>
           <View style={styles.cardContent}>
