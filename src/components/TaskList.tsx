@@ -6,7 +6,7 @@ import Entypo from "@expo/vector-icons/Entypo";
 type TaskItem = {
   id: string;
   title: string;
-  category: "Yet to Start" | "OnGoing" | "Completed";
+  status: "Yet to Start" | "OnGoing" | "Completed";
   priority: "High" | "Medium" | "Low";
 };
 
@@ -25,15 +25,15 @@ const renderTaskItem = ({ item }: { item: TaskItem }) => (
         <View className="flex items-center mr-2">
           <View
             className={`w-5 h-5 rounded-full ${
-              item.category === "Yet to Start"
+              item.status === "Yet to Start"
                 ? "bg-red-500"
-                : item.category === "OnGoing"
+                : item.status === "OnGoing"
                 ? "bg-yellow-500"
                 : "bg-green-500"
             }`}
           />
 
-          <Text className="mt-1 text-xs text-gray-600">{item.category}</Text>
+          <Text className="mt-1 text-xs text-gray-600">{item.status}</Text>
         </View>
       )}
     />
@@ -64,7 +64,7 @@ const TaskList = ({ data }: Props) => {
       <FlatList
         data={data}
         renderItem={renderTaskItem}
-        keyExtractor={(item) => `${item.id}-${item.category}`}
+        keyExtractor={(item) => `${item.id}-${item.status}`}
         showsVerticalScrollIndicator={false}
       />
     </View>

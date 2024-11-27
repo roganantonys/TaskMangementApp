@@ -1,27 +1,16 @@
-import React from "react";
+import React, { useState } from "react";
 import { View, Text, FlatList, TouchableOpacity } from "react-native";
 
 import { task } from "../data/tasksData";
 import TaskList from "../components/TaskList";
 
+import { FAB } from "react-native-paper";
+
 type Props = {};
 
 const TaskScreen = (props: Props) => {
   const taskData = task;
-  const allTasks = [
-    ...taskData.tasks.yetToStart.map((item) => ({
-      ...item,
-      category: "Yet to Start",
-    })),
-    ...taskData.tasks.ongoing.map((item) => ({
-      ...item,
-      category: "OnGoing",
-    })),
-    ...taskData.tasks.finishedTasks.map((item) => ({
-      ...item,
-      category: "Completed",
-    })),
-  ];
+  const allTasks = taskData.tasks;
 
   return (
     <View className="flex-1">
@@ -31,7 +20,9 @@ const TaskScreen = (props: Props) => {
         </TouchableOpacity>
       </View>
 
-      <TaskList data={allTasks} />
+      <View className="flex-1">
+        <TaskList data={allTasks} />
+      </View>
     </View>
   );
 };

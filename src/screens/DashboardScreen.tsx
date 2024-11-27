@@ -4,12 +4,22 @@ import { Card } from "react-native-paper";
 import { Circle } from "react-native-progress";
 import { task } from "../data/tasksData";
 import CustomCard from "../components/CustomCard";
+import { FAB } from "react-native-paper";
+import AddTaskModal from "../components/AddTaskModal";
 
 type Props = {};
 
 const DashboardScreen = (props: Props) => {
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
   const taskData = task;
-  console.log("taskData:", taskData.tasks.yetToStart);
+  const onGoingTask = taskData.tasks.filter(
+    (task) => task.status === "OnGoing"
+  );
+  const yetToStart = taskData.tasks.filter(
+    (task) => task.status === "Yet to Start"
+  );
+
   const [animationStatus, setAnimationStatus] = useState<boolean>(true);
   const progress = 0.75;
 
@@ -22,55 +32,64 @@ const DashboardScreen = (props: Props) => {
   }, []);
 
   return (
-    <View>
-      <Card style={styles.card}>
-        <Card.Content style={styles.content}>
-          {/* Left Side: Text */}
-          <View style={styles.textContainer}>
-            <Text style={styles.title}>Task Progress</Text>
-            {/* <Text style={styles.description}>
-            You have completed 75% of your tasks for today. Keep going!
-          </Text> */}
+    <>
+      <View>
+        <Card style={styles.card}>
+          <Card.Content style={styles.content}>
+            <View style={styles.textContainer}>
+              <Text style={styles.title}>Task Progress</Text>
+            </View>
+
+            <View style={styles.progressContainer}>
+              <Circle
+                progress={progress}
+                size={80}
+                thickness={10}
+                showsText={true}
+                color="#659287"
+                unfilledColor="#DEAA79"
+                textStyle={styles.progressText}
+                animated={true}
+                formatText={() => "75%"}
+                indeterminateAnimationDuration={2000}
+                indeterminate={animationStatus}
+                // textStyle={{ color: "blue", fontWeight: "bold" }}
+              />
+            </View>
+          </Card.Content>
+        </Card>
+
+        <View>
+          <View className="ml-2 mb-2">
+            <Text className="text-left text-xl font-bold text-gray-800">
+              Yet To Start
+            </Text>
           </View>
 
-          <View style={styles.progressContainer}>
-            <Circle
-              progress={progress}
-              size={80}
-              thickness={10}
-              showsText={true}
-              color="#659287"
-              unfilledColor="#DEAA79"
-              textStyle={styles.progressText}
-              animated={true}
-              formatText={() => "75%"}
-              indeterminateAnimationDuration={2000}
-              indeterminate={animationStatus}
-              // textStyle={{ color: "blue", fontWeight: "bold" }}
-            />
+          <CustomCard data={yetToStart} />
+        </View>
+
+        <View>
+          <View className="ml-2 mb-2">
+            <Text className="text-left text-xl font-bold text-gray-800">
+              onGoing
+            </Text>
           </View>
-        </Card.Content>
-      </Card>
-
-      <View>
-        <View className="ml-2 mb-2">
-          <Text className="text-left text-xl font-bold text-gray-800">
-            Yet To Start
-          </Text>
+          <CustomCard data={onGoingTask} />
         </View>
-
-        <CustomCard data={taskData.tasks.yetToStart} />
       </View>
-
-      <View>
-        <View className="ml-2 mb-2">
-          <Text className="text-left text-xl font-bold text-gray-800">
-            onGoing
-          </Text>
-        </View>
-        <CustomCard data={taskData.tasks.ongoing} />
-      </View>
-    </View>
+      <FAB
+        icon="plus"
+        className="bg-[#659287] bottom-[-4px] right-0 m-[16px] absolute"
+        onPress={() => setModalVisible(true)}
+      />
+      {modalVisible && (
+        <AddTaskModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+        />
+      )}
+    </>
   );
 };
 

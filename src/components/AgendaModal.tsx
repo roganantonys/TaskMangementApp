@@ -48,7 +48,7 @@ const AgendaModal = ({ modalVisible, setModalVisible, items }) => {
 
       {/* Modal */}
       <Modal
-        animationType="slide"
+        animationType="fade"
         transparent={true}
         visible={modalVisible}
         onRequestClose={closeModal}
