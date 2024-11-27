@@ -1,10 +1,23 @@
-import React from "react";
-import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  StyleSheet,
+  Modal,
+} from "react-native";
 import { Agenda, AgendaSchedule } from "react-native-calendars";
 import { FAB } from "react-native-paper";
+import AgendaModal from "../components/AgendaModal";
 
 const AgendaScreen = () => {
   console.log("profile clicked");
+
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
+
+  const openModal = () => setModalVisible(true);
+  const closeModal = () => setModalVisible(false);
 
   interface Event {
     time: string;
@@ -64,7 +77,7 @@ const AgendaScreen = () => {
     <View className="flex-1 p-4">
       <Agenda
         items={items}
-        selected={new Date().toISOString().split("T")[0]}
+        selected={"2024-11-26"}
         renderItem={renderAgendaItem}
         renderEmptyData={() => (
           <View style={styles.emptyData}>
@@ -78,10 +91,17 @@ const AgendaScreen = () => {
           selectedDotColor: "#00adf5",
         }}
       />
+      {modalVisible && (
+        <AgendaModal
+          modalVisible={modalVisible}
+          setModalVisible={setModalVisible}
+          items={items}
+        />
+      )}
       <FAB
         icon="plus"
         style={styles.fab}
-        onPress={() => console.log("Pressed")}
+        onPress={() => setModalVisible(true)}
       />
     </View>
   );

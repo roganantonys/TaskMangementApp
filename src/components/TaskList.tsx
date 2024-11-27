@@ -1,6 +1,8 @@
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
 import React from "react";
 import { Card } from "react-native-paper";
+import Entypo from "@expo/vector-icons/Entypo";
+
 type TaskItem = {
   id: string;
   title: string;
@@ -36,17 +38,22 @@ const renderTaskItem = ({ item }: { item: TaskItem }) => (
       )}
     />
     <Card.Content>
-      <Text
-        className={`font-bold ${
-          item.priority === "High"
-            ? "text-red-600"
-            : item.priority === "Medium"
-            ? "text-yellow-500"
-            : "text-green-500"
-        }`}
-      >
-        {item.priority}
-      </Text>
+      <View className="flex-row justify-between mr-[2px]">
+        <Text
+          className={`font-bold ${
+            item.priority === "High"
+              ? "text-red-600"
+              : item.priority === "Medium"
+              ? "text-yellow-500"
+              : "text-green-500"
+          }`}
+        >
+          {item.priority}
+        </Text>
+        <TouchableOpacity onPress={() => console.log("edit clicked")}>
+          <Entypo name="edit" size={18} color="black" />
+        </TouchableOpacity>
+      </View>
     </Card.Content>
   </Card>
 );

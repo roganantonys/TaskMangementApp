@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, FlatList } from "react-native";
+import { View, Text, FlatList, TouchableOpacity } from "react-native";
 
 import { task } from "../data/tasksData";
 import TaskList from "../components/TaskList";
@@ -25,7 +25,12 @@ const TaskScreen = (props: Props) => {
 
   return (
     <View className="flex-1">
-      <View className="bg-[#A1EEBD] h-[20%] rounded-l-[40px] rounded-r-[40px] overflow-hidden"></View>
+      <View className="bg-[#A1EEBD] h-[20%] rounded-l-[40px] rounded-r-[40px] overflow-hidden justify-center items-center">
+        <TouchableOpacity className="bg-white w-[80px] h-[40px] rounded-[10px] border border-white justify-center items-center">
+          <Text className="text-black font-semibold">Completed</Text>
+        </TouchableOpacity>
+      </View>
+
       <TaskList data={allTasks} />
     </View>
   );
