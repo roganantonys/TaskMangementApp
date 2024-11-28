@@ -7,7 +7,7 @@ import AgendaScreen from "../screens/AgendaScreen";
 
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
-import { MaterialCommunityIcons } from "@expo/vector-icons";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 
 type Props = {};
 
@@ -49,8 +49,8 @@ const BottomTabNavigation = (props: Props) => {
         component={DashboardScreen}
         options={{
           tabBarIcon: ({ focused }: { focused: boolean }) => (
-            <MaterialIcons
-              name="dashboard"
+            <MaterialCommunityIcons
+              name={focused ? "view-dashboard" : "view-dashboard-outline"}
               size={focused ? 26 : 24}
               color={focused ? "#DEAA79" : "black"}
             />

@@ -1,28 +1,55 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Modal, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Modal,
+  TouchableOpacity,
+  ScrollView,
+  StyleSheet,
+  ActivityIndicator,
+} from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import DropDownPicker from "react-native-dropdown-picker";
 import { fireDB } from "../firebase";
-import { collection, getDocs, addDoc } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc,
+} from "firebase/firestore";
 import Toast from "react-native-toast-message";
+
+type TaskItem = {
+  id: string;
+  title: string;
+  status: "Yet to Start" | "OnGoing" | "Completed";
+  priority: "High" | "Medium" | "Low";
+  taskDesc: string;
+};
 
 type Props = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
+  item: TaskItem[];
 };
 
-const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
-  const [taskTitle, setTaskTitle] = useState("");
-  const [taskDesc, setTaskDesc] = useState("");
-  const [dueDate, setDueDate] = useState(new Date());
+const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
+  console.log("add task modal clikced:", item);
+  const [taskTitle, setTaskTitle] = useState(item?.title || "");
+  const [taskDesc, setTaskDesc] = useState(item?.description || "");
+  const [dueDate, setDueDate] = useState(
+    item?.dueDate ? new Date(item.dueDate) : new Date()
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
 
   // Dropdowns for status and priority
-  const [status, setStatus] = useState(null);
-  const [priority, setPriority] = useState(null);
+  const [status, setStatus] = useState(item?.status || null);
+  const [priority, setPriority] = useState(item?.priority || null);
   const [statusOpen, setStatusOpen] = useState(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
+  const [indicatorVisible, setIndicatorVisible] = useState(false);
 
   const statusOptions = [
     { label: "Yet to Start", value: "Yet to Start" },
@@ -40,6 +67,7 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
   const closeModal = () => setModalVisible(false);
 
   function onPressSave() {
+    setIndicatorVisible(true);
     const newItem = {
       title: taskTitle,
       description: taskDesc,
@@ -50,25 +78,53 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
 
     console.log("new Item:", newItem);
 
-    // sending data to firebase
-    addDoc(collection(fireDB, "tasks"), newItem)
-      .then((res) => {
-        console.log("succesfull:", res);
-        Toast.show({
-          type: "success",
-          text1: "Task added successfully", // Message for success
-          text2: "Your task has been added to the list", // Optional second line
+    if (item) {
+      // updating the data to fiebase
+      updateDoc(doc(fireDB, "tasks", item?.id), newItem)
+        .then((res) => {
+          console.log("succesfull:", res);
+          Toast.show({
+            type: "success",
+            text1: "Task Updated successfully", // Message for success
+            text2: "Your task has been Updated to the list", // Optional second line
+          });
+        })
+        .catch((error) => {
+          console.error("Error sending tasks to Firestore:", error);
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "Something went wrong while Updating the task",
+          });
+        })
+        .finally(() => {
+          setIndicatorVisible(false);
+          closeModal();
         });
-        closeModal();
-      })
-      .catch((error) => {
-        console.error("Error sending tasks to Firestore:", error);
-        Toast.show({
-          type: "error",
-          text1: "Error",
-          text2: "Something went wrong while adding the task",
+    } else {
+      // sending data to firebase
+      addDoc(collection(fireDB, "tasks"), newItem)
+        .then((res) => {
+          console.log("succesfull:", res);
+          Toast.show({
+            type: "success",
+            text1: "Task added successfully", // Message for success
+            text2: "Your task has been added to the list", // Optional second line
+          });
+        })
+        .catch((error) => {
+          console.error("Error sending tasks to Firestore:", error);
+          Toast.show({
+            type: "error",
+            text1: "Error",
+            text2: "Something went wrong while adding the task",
+          });
+        })
+        .finally(() => {
+          setIndicatorVisible(false);
+          closeModal();
         });
-      });
+    }
   }
 
   return (
@@ -81,9 +137,15 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
       <View className="flex-1 bg-[#00000080] justify-center items-center">
         <View className="w-[90%] bg-white rounded-[10px] p-[20px]">
           {/* Title */}
-          <Text className="font-bold text-center text-[20px] mb-[10px]">
-            Add Task
-          </Text>
+          {item ? (
+            <Text className="font-bold text-center text-[20px] mb-[10px]">
+              Edit Task
+            </Text>
+          ) : (
+            <Text className="font-bold text-center text-[20px] mb-[10px]">
+              Add Task
+            </Text>
+          )}
 
           {/* Task Title Input */}
           <TextInput
@@ -118,7 +180,7 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
             className="border border-black rounded-[5px] p-[10px] mb-[10px]"
           >
             <Text className="text-gray-700">
-              {dueDate.toDateString() || "Select Due Date"}
+              {dueDate.toISOString().split("T")[0] || "Select Due Date"}
             </Text>
           </TouchableOpacity>
           {showDatePicker && (
@@ -140,7 +202,7 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
             open={statusOpen}
             value={status}
             items={statusOptions}
-            setOpen={(open) => {
+            setOpen={(open: boolean) => {
               setStatusOpen(open);
               if (open) setPriorityOpen(false); // Close other dropdown
             }}
@@ -169,21 +231,22 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
             dropDownContainerStyle={{ zIndex: 2000 }}
           />
 
-          {/* Action Buttons */}
           <View className="flex-row justify-around mt-[20px]">
-            <Button mode="contained" onPress={closeModal} color="#FF3B30">
-              Cancel
-            </Button>
-            <Button
-              mode="contained"
+            <TouchableOpacity
+              style={styles.saveButton}
               onPress={() => {
-                // Handle save action here
                 onPressSave();
               }}
-              color="#34C759"
             >
-              Save
-            </Button>
+              {indicatorVisible ? (
+                <ActivityIndicator size="small" />
+              ) : (
+                <Text style={styles.buttonText}>Save</Text>
+              )}
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
+              <Text style={styles.buttonText}>Cancel</Text>
+            </TouchableOpacity>
           </View>
         </View>
       </View>
@@ -192,3 +255,24 @@ const AddTaskModal = ({ modalVisible, setModalVisible }: Props) => {
 };
 
 export default AddTaskModal;
+
+const styles = StyleSheet.create({
+  saveButton: {
+    backgroundColor: "#4CAF50",
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+    marginRight: 10,
+  },
+  cancelButton: {
+    backgroundColor: "#f44336",
+    padding: 10,
+    borderRadius: 5,
+    flex: 1,
+  },
+  buttonText: {
+    color: "#fff",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+});

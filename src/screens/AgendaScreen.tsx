@@ -1,89 +1,72 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
-  StyleSheet,
-  Modal,
-} from "react-native";
-import { Agenda, AgendaSchedule } from "react-native-calendars";
+import React, { useState, useEffect } from "react";
+import { View, Text } from "react-native";
+import { Agenda, AgendaItemsMap, AgendaEntry } from "react-native-calendars";
 import { FAB } from "react-native-paper";
 import AgendaModal from "../components/AgendaModal";
+import { onSnapshot, collection } from "firebase/firestore";
+import { fireDB } from "../firebase";
 
-const AgendaScreen = () => {
-  console.log("profile clicked");
+// Define the Task type
+interface Task {
+  time: string;
+  title: string;
+  id: string;
+  date: string;
+}
 
+const AgendaScreen: React.FC = () => {
+  const [events, setEvents] = useState<AgendaItemsMap<Task>>({});
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const openModal = () => setModalVisible(true);
-  const closeModal = () => setModalVisible(false);
+  useEffect(() => {
+    // Real-time listener for Firestore collection
+    const unsubscribe = onSnapshot(
+      collection(fireDB, "agendaItems"),
+      (querySnapshot) => {
+        const fetchedEvents: AgendaItemsMap<Task> = {};
 
-  interface Event {
-    time: string;
-    title: string;
-    location: string;
-    notes: string;
-    // other fields relevant to your event
-  }
+        querySnapshot.forEach((doc) => {
+          const data = doc.data(); // Explicitly cast to Task
+          const eventDate = data.date; // Date in 'YYYY-MM-DD' format
+          console.log("date", data);
+          if (!fetchedEvents[eventDate]) {
+            fetchedEvents[eventDate] = [];
+          }
 
-  type AgendaItems = {
-    [key: string]: Event[]; // A dictionary where the key is the date string, and the value is an array of events
-  };
+          fetchedEvents[eventDate].push({
+            ...data,
+            id: doc.id,
+          });
+        });
 
-  const items: AgendaItems = {
-    "2024-11-27": [
-      {
-        time: "10:00 AM",
-        title: "Team Stand-up Meeting",
-        location: "Conference Room 1",
-        notes: "Discuss progress, blockers, and upcoming deadlines.",
-      },
-      {
-        time: "2:00 PM",
-        title: "Code Review",
-        location: "Online Meeting",
-        notes: "Review the latest pull requests and ensure code quality.",
-      },
-    ],
-    "2024-11-28": [
-      {
-        time: "9:00 AM",
-        title: "Project Planning",
-        location: "Meeting Room 2",
-        notes: "Plan for the next sprint and allocate tasks.",
-      },
-    ],
-    "2024-11-29": [
-      {
-        time: "3:00 PM",
-        title: "Client Demo",
-        location: "Conference Room 1",
-        notes: "Show the client the latest build and gather feedback.",
-      },
-    ],
-  };
+        console.log("events:", fetchedEvents);
+        setEvents(fetchedEvents);
+      }
+    );
 
-  const renderAgendaItem = (item: Event) => (
-    <View style={styles.item}>
-      <Text style={styles.title}>{item.title}</Text>
-      <Text style={styles.time}>{item.time}</Text>
-      <Text style={styles.location}>{item.location}</Text>
-      <Text style={styles.notes}>{item.notes}</Text>
+    return () => unsubscribe();
+  }, []);
+
+  const renderAgendaItem = (item: Task) => (
+    <View className="bg-white p-4 rounded-lg shadow-md my-2">
+      <Text className="text-lg font-bold">{item.title}</Text>
+      <Text className="text-sm text-gray-500">{item.time}</Text>
+    </View>
+  );
+
+  const renderEmptyData = () => (
+    <View className="flex-1 justify-center items-center p-4">
+      <Text className="text-gray-500">No events for this day</Text>
     </View>
   );
 
   return (
-    <View className="flex-1 p-4">
+    <View className="flex-1 bg-gray-100 mt-[10px]">
       <Agenda
-        items={items}
+        items={events}
         selected={"2024-11-26"}
-        renderItem={renderAgendaItem}
-        renderEmptyData={() => (
-          <View style={styles.emptyData}>
-            <Text>No events for this day</Text>
-          </View>
-        )}
+        renderItem={(item) => renderAgendaItem(item)}
+        renderEmptyData={renderEmptyData}
         theme={{
           selectedDayBackgroundColor: "#00adf5",
           todayTextColor: "#00adf5",
@@ -95,12 +78,11 @@ const AgendaScreen = () => {
         <AgendaModal
           modalVisible={modalVisible}
           setModalVisible={setModalVisible}
-          items={items}
         />
       )}
       <FAB
         icon="plus"
-        style={styles.fab}
+        className="absolute bottom-4 right-4 bg-green-500"
         onPress={() => setModalVisible(true)}
       />
     </View>
@@ -108,51 +90,3 @@ const AgendaScreen = () => {
 };
 
 export default AgendaScreen;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 16,
-  },
-  item: {
-    backgroundColor: "#fff",
-    padding: 10,
-    marginVertical: 8,
-    borderRadius: 8,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  time: {
-    fontSize: 14,
-    color: "#555",
-  },
-  location: {
-    fontSize: 14,
-    color: "#777",
-  },
-  notes: {
-    fontSize: 12,
-    color: "#444",
-    marginTop: 5,
-  },
-  emptyData: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-
-  fab: {
-    position: "absolute",
-    margin: 16,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "#659287",
-  },
-});

@@ -7,7 +7,7 @@ type Task = {
   description: string;
   status: string;
   priority: string;
-  dueDate: string; // ISO string or any other format
+  dueDate: string; 
 };
 
 // Define the initial state type

@@ -7,17 +7,25 @@ import {
   TextInput,
   TouchableOpacity,
   Platform,
+  ActivityIndicator,
 } from "react-native";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { collection, getDocs, addDoc } from "firebase/firestore";
+import { fireDB } from "../firebase";
+import Toast from "react-native-toast-message";
 
-const AgendaModal = ({ modalVisible, setModalVisible, items }) => {
+type prop = {
+  modalVisible: boolean;
+  setModalVisible: (visible: boolean) => void;
+};
+const AgendaModal = ({ modalVisible, setModalVisible }: prop) => {
   const [task, setTask] = useState("");
   const [date, setDate] = useState(new Date());
   const [time, setTime] = useState(new Date());
-  const [taskItem, setTaskItem] = useState([]);
-  const [singletask, setSingleTask] = useState({});
+
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [indicatorVisible, setIndicatorVisible] = useState(false);
 
   const openModal = () => setModalVisible(true);
   const closeModal = () => setModalVisible(false);
@@ -32,21 +40,43 @@ const AgendaModal = ({ modalVisible, setModalVisible, items }) => {
     setShowTimePicker(false);
   };
 
-  //   function onSaveTask() {
-  //     return (
-  //         setSingleTask({`$date.toISOString().split("T")[0]`):[{title:task,time:time.toLocaleTimeString()}]})
-  //       // setTaskItem([...items,])
-  //       onClose()
-  //     );
-  //   }
+  function onSaveTask() {
+    setIndicatorVisible(true);
+    let AgendaItem = {
+      title: task,
+      time: time.toLocaleTimeString(),
+      date: date.toISOString().split("T")[0],
+    };
+    console.log("new AgendaItem:", AgendaItem);
+    addDoc(collection(fireDB, "agendaItems"), AgendaItem)
+      .then((res) => {
+        setIndicatorVisible(false);
+        console.log("saved succesfully");
+        Toast.show({
+          type: "success",
+          text1: "Event added successfully", // Message for success
+          text2: "Your Event added to the agenda", // Optional second line
+        });
+      })
+      .catch((err) => {
+        setIndicatorVisible(false);
+        console.log("can'save agenda");
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Something went wrong while adding the event",
+        });
+      })
+      .finally(() => {
+        closeModal();
+      });
+  }
   return (
     <View style={styles.container}>
-      {/* Open Modal Button */}
       <TouchableOpacity style={styles.openButton} onPress={openModal}>
         <Text style={styles.openButtonText}>Open Modal</Text>
       </TouchableOpacity>
 
-      {/* Modal */}
       <Modal
         animationType="fade"
         transparent={true}
@@ -109,14 +139,14 @@ const AgendaModal = ({ modalVisible, setModalVisible, items }) => {
               <TouchableOpacity
                 style={styles.saveButton}
                 onPress={() => {
-                  //   console.log("Task:", task);
-                  //   console.log("Date:", date.toISOString().split("T")[0]);
-                  //   console.log("Time:", time.toLocaleTimeString());
-                  //   closeModal();
                   onSaveTask();
                 }}
               >
-                <Text style={styles.buttonText}>Save</Text>
+                {indicatorVisible ? (
+                  <ActivityIndicator size="small" />
+                ) : (
+                  <Text style={styles.buttonText}>Save</Text>
+                )}
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.cancelButton}

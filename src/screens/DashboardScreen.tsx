@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, FlatList } from "react-native";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useLayoutEffect } from "react";
 import { Card } from "react-native-paper";
 import { Circle } from "react-native-progress";
 import { task } from "../data/tasksData";
@@ -17,7 +17,7 @@ const DashboardScreen = (props: Props) => {
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
-  const task = useSelector((state) => state.tasks.tasks);
+  const task = useSelector((state: any) => state.tasks.tasks);
   console.log("tasks:", task);
   const onGoingTask = task.filter((task: any) => task.status === "OnGoing");
   const yetToStart = task.filter((task: any) => task.status === "Yet to Start");
@@ -34,9 +34,10 @@ const DashboardScreen = (props: Props) => {
     return () => clearTimeout(timer);
   }, []);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const getData = async () => {
       onSnapshot(collection(fireDB, "tasks"), (res) => {
+        console.log("size", res.size);
         const task = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         console.log("fetched data:", task);
         dispatch(setTask(task));
@@ -46,51 +47,49 @@ const DashboardScreen = (props: Props) => {
   }, []);
 
   return (
-    <>
+    <View className="bg-white flex-1">
+      <Card style={styles.card}>
+        <Card.Content style={styles.content}>
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>Task Progress</Text>
+          </View>
+
+          <View style={styles.progressContainer}>
+            <Circle
+              progress={progress}
+              size={80}
+              thickness={10}
+              showsText={true}
+              color="#659287"
+              unfilledColor="#DEAA79"
+              textStyle={styles.progressText}
+              animated={true}
+              formatText={() => "75%"}
+              indeterminateAnimationDuration={2000}
+              indeterminate={animationStatus}
+              // textStyle={{ color: "blue", fontWeight: "bold" }}
+            />
+          </View>
+        </Card.Content>
+      </Card>
+
       <View>
-        <Card style={styles.card}>
-          <Card.Content style={styles.content}>
-            <View style={styles.textContainer}>
-              <Text style={styles.title}>Task Progress</Text>
-            </View>
-
-            <View style={styles.progressContainer}>
-              <Circle
-                progress={progress}
-                size={80}
-                thickness={10}
-                showsText={true}
-                color="#659287"
-                unfilledColor="#DEAA79"
-                textStyle={styles.progressText}
-                animated={true}
-                formatText={() => "75%"}
-                indeterminateAnimationDuration={2000}
-                indeterminate={animationStatus}
-                // textStyle={{ color: "blue", fontWeight: "bold" }}
-              />
-            </View>
-          </Card.Content>
-        </Card>
-
-        <View>
-          <View className="ml-2 mb-2">
-            <Text className="text-left text-xl font-bold text-gray-800">
-              Yet To Start
-            </Text>
-          </View>
-
-          <CustomCard data={yetToStart} />
+        <View className="ml-2 mb-2">
+          <Text className="text-left text-xl font-bold text-gray-800">
+            Yet To Start
+          </Text>
         </View>
 
-        <View>
-          <View className="ml-2 mb-2">
-            <Text className="text-left text-xl font-bold text-gray-800">
-              onGoing
-            </Text>
-          </View>
-          <CustomCard data={onGoingTask} />
+        <CustomCard data={yetToStart} />
+      </View>
+
+      <View>
+        <View className="ml-2 mb-2">
+          <Text className="text-left text-xl font-bold text-gray-800">
+            onGoing
+          </Text>
         </View>
+        <CustomCard data={onGoingTask} />
       </View>
       <FAB
         icon="plus"
@@ -103,7 +102,7 @@ const DashboardScreen = (props: Props) => {
           setModalVisible={setModalVisible}
         />
       )}
-    </>
+    </View>
   );
 };
 
