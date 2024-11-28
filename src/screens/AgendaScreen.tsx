@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { Agenda, AgendaItemsMap, AgendaEntry } from "react-native-calendars";
 import { FAB } from "react-native-paper";
 import AgendaModal from "../components/AgendaModal";
-import { onSnapshot, collection } from "firebase/firestore";
+import { onSnapshot, collection, deleteDoc, doc } from "firebase/firestore";
 import { fireDB } from "../firebase";
+import { AntDesign } from "@expo/vector-icons";
 
 // Define the Task type
 interface Task {
@@ -47,10 +48,27 @@ const AgendaScreen: React.FC = () => {
     return () => unsubscribe();
   }, []);
 
+  const onDeleteAgendaItem = async (id: any) => {
+    await deleteDoc(doc(fireDB, "agendaItems", id))
+      .then((res) => {
+        console.log("even deleted");
+      })
+      .catch((err) => {
+        console.log("event not deleted:", err);
+      });
+  };
   const renderAgendaItem = (item: Task) => (
-    <View className="bg-white p-4 rounded-lg shadow-md my-2">
-      <Text className="text-lg font-bold">{item.title}</Text>
-      <Text className="text-sm text-gray-500">{item.time}</Text>
+    <View className="bg-white p-4 rounded-lg shadow-md my-2 mr-[20px]">
+      <View>
+        <Text className="text-lg font-bold">{item.title}</Text>
+        <Text className="text-sm text-gray-500">{item.time}</Text>
+      </View>
+
+      <View className="flex-row justify-end items-center">
+        <TouchableOpacity onPress={() => onDeleteAgendaItem(item.id)}>
+          <AntDesign name="delete" size={20} color="red" />
+        </TouchableOpacity>
+      </View>
     </View>
   );
 

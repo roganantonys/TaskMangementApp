@@ -22,10 +22,10 @@ const StackNavigation = () => {
         contentStyle: { backgroundColor: "white" },
       }}
     >
+      <stack.Screen name="SignUp" component={SignUpScreen} />
       <stack.Screen name="BottomTab" component={BottomTabNavigation} />
       <stack.Screen name="OnBoarding" component={AppOverViewScreen} />
       <stack.Screen name="Login" component={LoginScreen} />
-      <stack.Screen name="SignUp" component={SignUpScreen} />
     </stack.Navigator>
   );
 };

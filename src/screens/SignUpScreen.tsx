@@ -1,11 +1,21 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { KeyboardTypeOptions, Pressable, StyleSheet, View } from "react-native";
+import {
+  KeyboardTypeOptions,
+  Pressable,
+  StyleSheet,
+  View,
+  ActivityIndicator,
+} from "react-native";
 import { TextInput, Button, Card, Text } from "react-native-paper";
 import { useForm, Controller } from "react-hook-form";
 import ControlledInput from "../components/ControlledInput";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackProps } from "../navigation/StackNavigation";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { fireAuth, fireDB } from "../firebase";
+import { setDoc, doc } from "firebase/firestore";
+import Toast from "react-native-toast-message";
 // Define color palette
 const colors = {
   primary: "#659287", // Main accent color
@@ -25,13 +35,46 @@ type formType = {
 };
 
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
+  const [indicatorVisible, setIndicatorVisible] = useState(false);
   // const navigation = useNavigation();
 
   const { control, handleSubmit } = useForm<formType>();
 
-  const handleSignUp = (data: any) => {
-    // Handle signup logic here
+  // onpress of signup button
+  const handleSignUp = async (data: any) => {
+    setIndicatorVisible(true);
     console.log("data:", data);
+    await createUserWithEmailAndPassword(fireAuth, data.email, data.password)
+      .then((res) => {
+        console.log("User created successfully:", res.user);
+        Toast.show({
+          type: "success",
+          text2: "User Created Successfully",
+        });
+        setDoc(doc(fireDB, "users", res.user.uid), {
+          email: data.email,
+          name: data.userName,
+          createdAt: new Date().toDateString(),
+        })
+          .then(() => {
+            console.log("User data stored in Firestore.");
+            navigation.navigate("Login");
+          })
+          .catch((err) => {
+            console.log("Error storing user data:", err);
+          });
+      })
+      .catch((err) => {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Can not add you at the moment",
+        });
+        console.log("Can't create user:", err);
+      })
+      .finally(() => {
+        setIndicatorVisible(false);
+      });
   };
 
   return (
@@ -74,7 +117,11 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
           />
 
           <Pressable onPress={handleSubmit(handleSignUp)} style={styles.button}>
-            <Text style={styles.buttonText}>Sign Up</Text>
+            {indicatorVisible ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.buttonText}>SignUp</Text>
+            )}
           </Pressable>
           <Button
             mode="text"

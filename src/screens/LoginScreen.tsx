@@ -1,11 +1,20 @@
 import { useNavigation } from "@react-navigation/native";
 import React, { useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  View,
+  ActivityIndicator,
+  KeyboardAvoidingView,
+} from "react-native";
 import { TextInput, Button, Card, Text } from "react-native-paper";
 import ControlledInput from "../components/ControlledInput";
 import { useForm, Controller } from "react-hook-form";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackProps } from "../navigation/StackNavigation";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { fireAuth } from "../firebase";
+import Toast from "react-native-toast-message";
 // Define color palette
 const colors = {
   primary: "#659287", // Main accent color
@@ -24,18 +33,41 @@ type LoginScreenProps = NativeStackScreenProps<StackProps, "Login">;
 
 const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
   const { control, handleSubmit } = useForm<formData>();
-
+  const [indicatorVisible, setIndicatorVisible] = useState(false);
   // const navigation = useNavigation();
 
-  const handleLogin = (data: any) => {
-    // Handle login logic here
+  const handleLogin = async (data: any) => {
+    setIndicatorVisible(true);
     console.log("loginData:", data);
-    navigation.replace("BottomTab");
+    await signInWithEmailAndPassword(fireAuth, data.email, data.password)
+      .then((res) => {
+        console.log("User Logged successfully:", res.user.uid);
+        Toast.show({
+          type: "success",
+          text2: "Logged in Successfully",
+        });
+        navigation.replace("BottomTab");
+      })
+      .catch((err) => {
+        Toast.show({
+          type: "error",
+          text1: "Error",
+          text2: "Can not add you at the moment",
+        });
+        console.log("Can't create user:", err);
+      })
+      .finally(() => {
+        setIndicatorVisible(false);
+      });
   };
 
   return (
     //  style={styles.container}
-    <View className="flex-1 justify-center items-center bg-[#FFE6A9]">
+    // <KeyboardAvoidingView behavior="padding">
+    <KeyboardAvoidingView
+      className="flex-1 justify-center items-center bg-[#FFE6A9]"
+      behavior="height"
+    >
       {/* style={styles.card}  */}
       <Card style={styles.card}>
         <Card.Content>
@@ -68,7 +100,11 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             secureTextEntry
           />
           <Pressable onPress={handleSubmit(handleLogin)} style={styles.button}>
-            <Text style={styles.buttonText}>Login</Text>
+            {indicatorVisible ? (
+              <ActivityIndicator size="small" />
+            ) : (
+              <Text style={styles.buttonText}>Login</Text>
+            )}
           </Pressable>
           <Button
             mode="text"
@@ -86,7 +122,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           </Button>
         </Card.Content>
       </Card>
-    </View>
+    </KeyboardAvoidingView>
   );
 };
 

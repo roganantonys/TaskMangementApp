@@ -23,15 +23,16 @@ const DashboardScreen = (props: Props) => {
   const yetToStart = task.filter((task: any) => task.status === "Yet to Start");
 
   const [animationStatus, setAnimationStatus] = useState<boolean>(true);
+  const [progressPer, setProgressPer] = useState(0);
   const progress = 0.75;
 
-  // for task progress bar animation
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  function animationTimer() {
+    setTimeout(() => {
       setAnimationStatus(false); // Stop animation after 3 seconds
-    }, 2000); // 3 seconds
-
-    return () => clearTimeout(timer);
+    }, 2000);
+  }
+  useEffect(() => {
+    animationTimer();
   }, []);
 
   useLayoutEffect(() => {
@@ -41,6 +42,15 @@ const DashboardScreen = (props: Props) => {
         const task = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         console.log("fetched data:", task);
         dispatch(setTask(task));
+        const finishedTaskCount = task.filter(
+          (item) => item.status == "Finished"
+        ).length;
+        const progress =
+          res.size > 0 ? (finishedTaskCount / res.size) * 100 : 0;
+        setProgressPer(Math.round(progress));
+        console.log("Progress Percentage:", Math.round(progress));
+
+        animationTimer();
       });
     };
     getData();
@@ -56,7 +66,7 @@ const DashboardScreen = (props: Props) => {
 
           <View style={styles.progressContainer}>
             <Circle
-              progress={progress}
+              progress={progressPer / 100}
               size={80}
               thickness={10}
               showsText={true}
@@ -64,10 +74,9 @@ const DashboardScreen = (props: Props) => {
               unfilledColor="#DEAA79"
               textStyle={styles.progressText}
               animated={true}
-              formatText={() => "75%"}
+              formatText={() => `${progressPer}%`}
               indeterminateAnimationDuration={2000}
               indeterminate={animationStatus}
-              // textStyle={{ color: "blue", fontWeight: "bold" }}
             />
           </View>
         </Card.Content>

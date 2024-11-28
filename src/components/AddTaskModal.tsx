@@ -24,7 +24,7 @@ import Toast from "react-native-toast-message";
 type TaskItem = {
   id: string;
   title: string;
-  status: "Yet to Start" | "OnGoing" | "Completed";
+  status: "Yet to Start" | "OnGoing" | "Finished";
   priority: "High" | "Medium" | "Low";
   taskDesc: string;
 };
