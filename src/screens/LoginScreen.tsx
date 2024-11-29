@@ -19,6 +19,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { FontAwesome } from "@expo/vector-icons";
 
 // Define color palette
 const colors = {
@@ -52,6 +53,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 
   console.log(errors);
   const [indicatorVisible, setIndicatorVisible] = useState(false);
+  const [passVisible, setPassVisible] = useState(true);
 
   // const handleLogin = async (data: LoginFormData) => {
   //   setIndicatorVisible(true);
@@ -147,6 +149,13 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             control={control}
             keyboardType="email-address"
             autoCapitalize="none"
+            right={
+              <TextInput.Icon
+                icon={() => (
+                  <FontAwesome name="user-o" size={24} color="black" />
+                )}
+              />
+            }
           />
           {errors.email && (
             <Text style={styles.errorText}>{errors.email.message}</Text>
@@ -155,7 +164,15 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
             name="password"
             label="Enter your password"
             control={control}
-            secureTextEntry
+            secureTextEntry={passVisible}
+            right={
+              <TextInput.Icon
+                icon={() => <FontAwesome name="eye" size={24} color="black" />}
+                onPress={() => {
+                  setPassVisible(!passVisible);
+                }}
+              />
+            }
           />
           {errors.password && (
             <Text style={styles.errorText}>{errors.password.message}</Text>

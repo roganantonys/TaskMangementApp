@@ -28,6 +28,7 @@ const ControlledInput = ({
   label,
   control,
   rules,
+
   ...props
 }: inputType) => (
   <Controller

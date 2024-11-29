@@ -26,6 +26,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { FontAwesome } from "@expo/vector-icons";
 
 type TaskItem = {
   id: string;
@@ -42,24 +43,6 @@ type Props = {
   item: TaskItem;
 };
 
-const schema = z.object({
-  taskTitle: z.string().min(1, { message: "Task title is required" }), // Title must not be empty
-  taskDesc: z
-    .string()
-    .min(5, { message: "Description must be at least 5 characters long" }), // Description length validation
-  dueDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
-    message: "Invalid date format", // Ensures that the date is valid
-  }),
-  status: z.enum(["pending", "in-progress", "completed"], {
-    message: "Status must be one of: pending, in-progress, or completed", // Enum for status values
-  }),
-  priority: z.enum(["low", "medium", "high"], {
-    message: "Priority must be one of: low, medium, or high", // Enum for priority values
-  }),
-});
-
-type AddTask = z.infer<typeof schema>;
-
 const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
   console.log("add task modal clikced:", item);
   const [taskTitle, setTaskTitle] = useState(item?.title || "");
@@ -75,10 +58,6 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
   const [statusOpen, setStatusOpen] = useState<boolean>(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [indicatorVisible, setIndicatorVisible] = useState(false);
-
-  const {
-    formState: { errors },
-  } = useForm<AddTask>({ resolver: zodResolver(schema) });
 
   const statusOptions = [
     { label: "Yet to Start", value: "Yet to Start" },
@@ -190,11 +169,11 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
               activeOutlineColor="black"
               className="mb-[10px]"
             />
-            {errors.taskTitle && (
+            {/* {errors.taskTitle && (
               <Text className="text-red-500 text-xs mb-2">
                 {errors.taskTitle.message}
               </Text>
-            )}
+            )} */}
 
             {/* Task Description Input */}
             <TextInput

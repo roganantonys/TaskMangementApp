@@ -18,6 +18,7 @@ import { setDoc, doc } from "firebase/firestore";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
 // Define color palette
 const colors = {
   primary: "#659287", // Main accent color
@@ -47,6 +48,7 @@ const schema = z.object({
 type SignInFormData = z.infer<typeof schema>;
 const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
   const [indicatorVisible, setIndicatorVisible] = useState(false);
+  const [passVisible, setPassVisible] = useState(true);
   // const navigation = useNavigation();
 
   const {
@@ -101,7 +103,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             name="userName"
             label="Enter your name"
             control={control}
+            right={
+              <TextInput.Icon
+                icon={() => (
+                  <FontAwesome name="user-o" size={24} color="black" />
+                )}
+              />
+            }
           />
+
           {errors.userName && (
             <Text style={styles.errorText}>{errors.userName.message}</Text>
           )}
@@ -111,6 +121,13 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             control={control}
             keyboardType="email-address"
             autoCapitalize="none"
+            right={
+              <TextInput.Icon
+                icon={() => (
+                  <MaterialIcons name="email" size={24} color="black" />
+                )}
+              />
+            }
           />
           {errors.email && (
             <Text style={styles.errorText}>{errors.email.message}</Text>
@@ -119,7 +136,15 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
             name="password"
             label="Enter your password"
             control={control}
-            secureTextEntry
+            secureTextEntry={passVisible}
+            right={
+              <TextInput.Icon
+                icon={() => <FontAwesome name="eye" size={24} color="black" />}
+                onPress={() => {
+                  setPassVisible(!passVisible);
+                }}
+              />
+            }
           />
           {errors.password && (
             <Text style={styles.errorText}>{errors.password.message}</Text>

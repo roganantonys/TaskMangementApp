@@ -15,10 +15,12 @@ const SwiperComponent = ({ url, title, description }: Props) => {
         <Image source={url} style={styles.image} resizeMode="contain" />
       </View>
       <View className="flex-[1] bg-[#A1EEBD]">
-        <Text className="text-2xl font-bold mt-5 mb-2 text-center">
+        <Text className="text-2xl font-bold mt-5 mb-2 text-center tracking-[5]">
           {title}
         </Text>
-        <Text className="text-base text-center text-black">{description}</Text>
+        <Text className="text-center text-black text-[20px]">
+          {description}
+        </Text>
       </View>
     </View>
   );

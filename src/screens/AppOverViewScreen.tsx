@@ -27,6 +27,11 @@ const AppOverViewScreen: React.FC<AppOverViewScreen> = ({ navigation }) => {
             description="See how far you've come."
             url={require("../../assets/images/progressBar.png")}
           />
+          <SwiperComponent
+            title="Edit the task"
+            description="Mark as completed once you finish."
+            url={require("../../assets/images/edit.jpg")}
+          />
         </Swiper>
         <View className="bg-[#A1EEBD] flex-row justify-between">
           <Button title="Skip" onPress={() => navigation.replace("Login")} />
