@@ -19,6 +19,15 @@ import { setTask } from "../store/slices/taskSlice";
 
 type Props = {};
 
+type TaskType = {
+  id: string;
+  title: string;
+  description: string;
+  dueDate: string;
+  status: "Yet to Start" | "OnGoing" | "Finished";
+  priority: "High" | "Medium" | "Low";
+};
+
 const DashboardScreen = (props: Props) => {
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
@@ -46,7 +55,10 @@ const DashboardScreen = (props: Props) => {
     const getData = async () => {
       onSnapshot(collection(fireDB, "tasks"), (res) => {
         console.log("size", res.size);
-        const task = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+        const task: TaskType[] = res.docs.map((doc) => ({
+          id: doc.id,
+          ...doc.data(),
+        })) as TaskType[];
         console.log("fetched data:", task);
         dispatch(setTask(task));
 

@@ -20,15 +20,14 @@ const AgendaScreen: React.FC = () => {
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   useEffect(() => {
-    // Real-time listener for Firestore collection
     const unsubscribe = onSnapshot(
       collection(fireDB, "agendaItems"),
       (querySnapshot) => {
         const fetchedEvents: AgendaItemsMap<Task> = {};
 
         querySnapshot.forEach((doc) => {
-          const data = doc.data(); // Explicitly cast to Task
-          const eventDate = data.date; // Date in 'YYYY-MM-DD' format
+          const data = doc.data();
+          const eventDate = data.date;
           console.log("date", data);
           if (!fetchedEvents[eventDate]) {
             fetchedEvents[eventDate] = [];
@@ -82,9 +81,9 @@ const AgendaScreen: React.FC = () => {
     <View className="flex-1 bg-gray-100 mt-[10px]">
       <Agenda
         items={events}
-        selected={"2024-11-26"}
+        selected={"2024-11-28"}
         renderItem={(item) => renderAgendaItem(item)}
-        renderEmptyData={renderEmptyData}
+        // renderEmptyData={renderEmptyData}
         theme={{
           selectedDayBackgroundColor: "#00adf5",
           todayTextColor: "#00adf5",

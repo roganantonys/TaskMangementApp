@@ -10,19 +10,29 @@ const CustomCard = ({ data }: { data: any }) => {
       data.status === "Yet to Start" ? "#FFE6A9" : "#D3F9D8"; // Yellow for Yet to Start, Green for Ongoing
 
     return (
-      <Card style={[styles.flexCard, { backgroundColor: cardBackgroundColor }]}>
+      <Card
+        className="my-3 rounded-2xl shadow-lg w-80 mx-3 pb-2.5 pt-1.5"
+        style={{ backgroundColor: cardBackgroundColor }}
+      >
         <Card.Title
           title={data.title}
-          titleStyle={styles.cardTitle}
-          // subtitle={data.title}
+          titleStyle={{
+            fontSize: 16,
+            fontWeight: "600",
+            color: "#333",
+          }}
         />
         <Card.Content>
-          <View style={styles.cardContent}>
-            <Text style={styles.cardDescription}>{data.description}</Text>
+          <View className="p-4">
+            <Text className="text-sm text-gray-600 text-left leading-5">
+              {data.description}
+            </Text>
           </View>
         </Card.Content>
         <Card.Content>
-          <Text style={styles.dueDate}>{`Due Date: ${data.dueDate}`}</Text>
+          <Text className="text-xs italic text-gray-500 font-bold text-left mt-1">
+            {`Due Date: ${data.dueDate}`}
+          </Text>
         </Card.Content>
       </Card>
     );
@@ -40,46 +50,3 @@ const CustomCard = ({ data }: { data: any }) => {
 };
 
 export default CustomCard;
-
-const styles = StyleSheet.create({
-  flexCard: {
-    marginVertical: 12,
-    borderRadius: 16,
-    elevation: 6,
-    width: 320,
-    marginHorizontal: 12,
-    paddingBottom: 10,
-    paddingTop: 5,
-    shadowColor: "#000",
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-  },
-  cardContent: {
-    padding: 15,
-  },
-  cardTitle: {
-    fontSize: 18,
-    fontWeight: "600",
-    color: "#333",
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: "#888",
-    marginTop: 4,
-  },
-  cardDescription: {
-    fontSize: 14,
-    color: "#666",
-    textAlign: "left",
-    lineHeight: 20,
-  },
-  dueDate: {
-    fontSize: 12,
-    fontStyle: "italic",
-    color: "#777",
-    fontWeight: "bold",
-    textAlign: "left",
-    marginTop: 5,
-  },
-});

@@ -27,14 +27,5 @@ const SwiperComponent = ({ url, title, description }: Props) => {
 export default SwiperComponent;
 
 const styles = StyleSheet.create({
-  slide: { flex: 1, marginTop: 10 },
   image: { width: 300, height: 300, marginBottom: 20 },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 10,
-    textAlign: "center",
-    marginTop: 20,
-  },
-  description: { fontSize: 16, color: "#666", textAlign: "center" },
 });

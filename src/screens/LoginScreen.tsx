@@ -188,13 +188,6 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  //   container: {
-  //     flex: 1,
-  //     justifyContent: "center",
-  //     alignItems: "center",
-  //     backgroundColor: colors.tertiary, // Background color
-  //   },
-
   card: {
     width: "90%",
     padding: 20,

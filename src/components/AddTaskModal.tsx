@@ -8,6 +8,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   KeyboardAvoidingView,
+  Platform,
 } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -24,19 +25,21 @@ import Toast from "react-native-toast-message";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
+import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 type TaskItem = {
   id: string;
   title: string;
   status: "Yet to Start" | "OnGoing" | "Finished";
   priority: "High" | "Medium" | "Low";
-  taskDesc: string;
+  description: string;
+  dueDate: Date;
 };
 
 type Props = {
   modalVisible: boolean;
   setModalVisible: (visible: boolean) => void;
-  item: TaskItem[];
+  item: TaskItem;
 };
 
 const schema = z.object({
@@ -69,7 +72,7 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
   // Dropdowns for status and priority
   const [status, setStatus] = useState(item?.status || null);
   const [priority, setPriority] = useState(item?.priority || null);
-  const [statusOpen, setStatusOpen] = useState(false);
+  const [statusOpen, setStatusOpen] = useState<boolean>(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [indicatorVisible, setIndicatorVisible] = useState(false);
 
@@ -154,14 +157,17 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
   }
 
   return (
-    <ScrollView>
-      <Modal
-        animationType="fade"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={closeModal}
+    <Modal
+      animationType="fade"
+      transparent={true}
+      visible={modalVisible}
+      onRequestClose={closeModal}
+    >
+      <KeyboardAwareScrollView
+        enableOnAndroid={true}
+        className="flex-1 bg-[#00000080]"
       >
-        <View className="flex-1 bg-[#00000080] justify-center items-center">
+        <View className="justify-center items-center mt-20">
           <View className="w-[90%] bg-white rounded-[10px] p-[20px]">
             {/* Title */}
             {item ? (
@@ -185,7 +191,9 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
               className="mb-[10px]"
             />
             {errors.taskTitle && (
-              <Text style={styles.errorText}>{errors.taskTitle.message}</Text>
+              <Text className="text-red-500 text-xs mb-2">
+                {errors.taskTitle.message}
+              </Text>
             )}
 
             {/* Task Description Input */}
@@ -232,9 +240,9 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
               open={statusOpen}
               value={status}
               items={statusOptions}
-              setOpen={(open: boolean) => {
+              setOpen={(open) => {
                 setStatusOpen(open);
-                if (open) setPriorityOpen(false); // Close other dropdown
+                // if (open) setPriorityOpen(false);
               }}
               setValue={setStatus}
               placeholder="Select Status"
@@ -263,7 +271,7 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
 
             <View className="flex-row justify-around mt-[20px]">
               <TouchableOpacity
-                style={styles.saveButton}
+                className="bg-[#4CAF50] p-2 rounded-md flex-1 mr-2"
                 onPress={() => {
                   onPressSave();
                 }}
@@ -271,47 +279,21 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
                 {indicatorVisible ? (
                   <ActivityIndicator size="small" />
                 ) : (
-                  <Text style={styles.buttonText}>Save</Text>
+                  <Text className="text-white text-center font-bold">Save</Text>
                 )}
               </TouchableOpacity>
               <TouchableOpacity
-                style={styles.cancelButton}
+                className="bg-[#f44336] p-2 rounded-md flex-1"
                 onPress={closeModal}
               >
-                <Text style={styles.buttonText}>Cancel</Text>
+                <Text className="text-white text-center font-bold">Cancel</Text>
               </TouchableOpacity>
             </View>
           </View>
         </View>
-      </Modal>
-    </ScrollView>
+      </KeyboardAwareScrollView>
+    </Modal>
   );
 };
 
 export default AddTaskModal;
-
-const styles = StyleSheet.create({
-  saveButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
-    borderRadius: 5,
-    flex: 1,
-    marginRight: 10,
-  },
-  cancelButton: {
-    backgroundColor: "#f44336",
-    padding: 10,
-    borderRadius: 5,
-    flex: 1,
-  },
-  buttonText: {
-    color: "#fff",
-    textAlign: "center",
-    fontWeight: "bold",
-  },
-  errorText: {
-    color: "red",
-    fontSize: 12,
-    marginBottom: 10,
-  },
-});
