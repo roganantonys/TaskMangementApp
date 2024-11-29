@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { View, Text, TouchableOpacity } from "react-native";
-import { Agenda, AgendaItemsMap, AgendaEntry } from "react-native-calendars";
+import { Agenda, AgendaEntry } from "react-native-calendars";
 import { FAB } from "react-native-paper";
 import AgendaModal from "../components/AgendaModal";
 import { onSnapshot, collection, deleteDoc, doc } from "firebase/firestore";
@@ -16,7 +16,7 @@ interface Task {
 }
 
 const AgendaScreen: React.FC = () => {
-  const [events, setEvents] = useState<AgendaItemsMap<Task>>({});
+  const [events, setEvents] = useState<Task>({});
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   useEffect(() => {
@@ -100,7 +100,7 @@ const AgendaScreen: React.FC = () => {
       )}
       <FAB
         icon="plus"
-        className="absolute bottom-4 right-4 bg-green-500"
+        className="absolute bottom-4 right-4 bg-[#659287]"
         onPress={() => setModalVisible(true)}
       />
     </View>

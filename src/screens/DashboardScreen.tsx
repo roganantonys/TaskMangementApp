@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, FlatList } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  ActivityIndicator,
+} from "react-native";
 import React, { useEffect, useState, useLayoutEffect } from "react";
 import { Card } from "react-native-paper";
 import { Circle } from "react-native-progress";
@@ -16,6 +22,7 @@ type Props = {};
 const DashboardScreen = (props: Props) => {
   const dispatch = useDispatch();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const [indicatorVisible, setIndicatorVisible] = useState(true);
 
   const task = useSelector((state: any) => state.tasks.tasks);
   console.log("tasks:", task);
@@ -24,7 +31,6 @@ const DashboardScreen = (props: Props) => {
 
   const [animationStatus, setAnimationStatus] = useState<boolean>(true);
   const [progressPer, setProgressPer] = useState(0);
-  const progress = 0.75;
 
   function animationTimer() {
     setTimeout(() => {
@@ -35,13 +41,15 @@ const DashboardScreen = (props: Props) => {
     animationTimer();
   }, []);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
+    // setIndicatorVisible(true);
     const getData = async () => {
       onSnapshot(collection(fireDB, "tasks"), (res) => {
         console.log("size", res.size);
         const task = res.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
         console.log("fetched data:", task);
         dispatch(setTask(task));
+
         const finishedTaskCount = task.filter(
           (item) => item.status == "Finished"
         ).length;
@@ -49,7 +57,7 @@ const DashboardScreen = (props: Props) => {
           res.size > 0 ? (finishedTaskCount / res.size) * 100 : 0;
         setProgressPer(Math.round(progress));
         console.log("Progress Percentage:", Math.round(progress));
-
+        setIndicatorVisible(false);
         animationTimer();
       });
     };
@@ -82,24 +90,33 @@ const DashboardScreen = (props: Props) => {
         </Card.Content>
       </Card>
 
-      <View>
-        <View className="ml-2 mb-2">
-          <Text className="text-left text-xl font-bold text-gray-800">
-            Yet To Start
-          </Text>
+      {indicatorVisible ? (
+        <View className="flex-1 justify-center items-center">
+          <ActivityIndicator size="small" />
         </View>
+      ) : (
+        <>
+          <View>
+            <View className="ml-2 mb-2">
+              <Text className="text-left text-xl font-bold text-gray-800">
+                Yet To Start
+              </Text>
+            </View>
 
-        <CustomCard data={yetToStart} />
-      </View>
+            <CustomCard data={yetToStart} />
+          </View>
 
-      <View>
-        <View className="ml-2 mb-2">
-          <Text className="text-left text-xl font-bold text-gray-800">
-            onGoing
-          </Text>
-        </View>
-        <CustomCard data={onGoingTask} />
-      </View>
+          <View>
+            <View className="ml-2 mb-2">
+              <Text className="text-left text-xl font-bold text-gray-800">
+                onGoing
+              </Text>
+            </View>
+            <CustomCard data={onGoingTask} />
+          </View>
+        </>
+      )}
+
       <FAB
         icon="plus"
         className="bg-[#659287] bottom-[-4px] right-0 m-[16px] absolute"

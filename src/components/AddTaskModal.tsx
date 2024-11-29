@@ -7,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   ActivityIndicator,
+  KeyboardAvoidingView,
 } from "react-native";
 import { TextInput, Button } from "react-native-paper";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -20,6 +21,9 @@ import {
   doc,
 } from "firebase/firestore";
 import Toast from "react-native-toast-message";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
 
 type TaskItem = {
   id: string;
@@ -34,6 +38,24 @@ type Props = {
   setModalVisible: (visible: boolean) => void;
   item: TaskItem[];
 };
+
+const schema = z.object({
+  taskTitle: z.string().min(1, { message: "Task title is required" }), // Title must not be empty
+  taskDesc: z
+    .string()
+    .min(5, { message: "Description must be at least 5 characters long" }), // Description length validation
+  dueDate: z.string().refine((date) => !isNaN(Date.parse(date)), {
+    message: "Invalid date format", // Ensures that the date is valid
+  }),
+  status: z.enum(["pending", "in-progress", "completed"], {
+    message: "Status must be one of: pending, in-progress, or completed", // Enum for status values
+  }),
+  priority: z.enum(["low", "medium", "high"], {
+    message: "Priority must be one of: low, medium, or high", // Enum for priority values
+  }),
+});
+
+type AddTask = z.infer<typeof schema>;
 
 const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
   console.log("add task modal clikced:", item);
@@ -50,6 +72,10 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
   const [statusOpen, setStatusOpen] = useState(false);
   const [priorityOpen, setPriorityOpen] = useState(false);
   const [indicatorVisible, setIndicatorVisible] = useState(false);
+
+  const {
+    formState: { errors },
+  } = useForm<AddTask>({ resolver: zodResolver(schema) });
 
   const statusOptions = [
     { label: "Yet to Start", value: "Yet to Start" },
@@ -128,129 +154,137 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
   }
 
   return (
-    <Modal
-      animationType="fade"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={closeModal}
-    >
-      <View className="flex-1 bg-[#00000080] justify-center items-center">
-        <View className="w-[90%] bg-white rounded-[10px] p-[20px]">
-          {/* Title */}
-          {item ? (
-            <Text className="font-bold text-center text-[20px] mb-[10px]">
-              Edit Task
-            </Text>
-          ) : (
-            <Text className="font-bold text-center text-[20px] mb-[10px]">
-              Add Task
-            </Text>
-          )}
+    <ScrollView>
+      <Modal
+        animationType="fade"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={closeModal}
+      >
+        <View className="flex-1 bg-[#00000080] justify-center items-center">
+          <View className="w-[90%] bg-white rounded-[10px] p-[20px]">
+            {/* Title */}
+            {item ? (
+              <Text className="font-bold text-center text-[20px] mb-[10px]">
+                Edit Task
+              </Text>
+            ) : (
+              <Text className="font-bold text-center text-[20px] mb-[10px]">
+                Add Task
+              </Text>
+            )}
 
-          {/* Task Title Input */}
-          <TextInput
-            label="Task Title"
-            value={taskTitle}
-            mode="outlined"
-            onChangeText={(text: string) => setTaskTitle(text)}
-            outlineColor="black"
-            activeOutlineColor="black"
-            className="mb-[10px]"
-          />
-
-          {/* Task Description Input */}
-          <TextInput
-            label="Task Description"
-            value={taskDesc}
-            mode="outlined"
-            multiline={true}
-            numberOfLines={4}
-            style={{ height: 100 }}
-            onChangeText={(text: string) => setTaskDesc(text)}
-            outlineColor="black"
-            activeOutlineColor="black"
-            className="mb-[10px]"
-          />
-          <View className="">
-            <Text className="font-bold text-[14px mt-[10px]">Due Date:</Text>
-          </View>
-
-          <TouchableOpacity
-            onPress={() => setShowDatePicker(true)}
-            className="border border-black rounded-[5px] p-[10px] mb-[10px]"
-          >
-            <Text className="text-gray-700">
-              {dueDate.toISOString().split("T")[0] || "Select Due Date"}
-            </Text>
-          </TouchableOpacity>
-          {showDatePicker && (
-            <DateTimePicker
-              value={dueDate}
-              mode="date"
-              display="default"
-              onChange={(event, selectedDate) => {
-                setShowDatePicker(false);
-                if (selectedDate) setDueDate(selectedDate);
-              }}
+            {/* Task Title Input */}
+            <TextInput
+              label="Task Title"
+              value={taskTitle}
+              mode="outlined"
+              onChangeText={(text: string) => setTaskTitle(text)}
+              outlineColor="black"
+              activeOutlineColor="black"
+              className="mb-[10px]"
             />
-          )}
+            {errors.taskTitle && (
+              <Text style={styles.errorText}>{errors.taskTitle.message}</Text>
+            )}
 
-          <View className="">
-            <Text className="font-bold text-[14px mt-[10px]">Status:</Text>
-          </View>
-          <DropDownPicker
-            open={statusOpen}
-            value={status}
-            items={statusOptions}
-            setOpen={(open: boolean) => {
-              setStatusOpen(open);
-              if (open) setPriorityOpen(false); // Close other dropdown
-            }}
-            setValue={setStatus}
-            placeholder="Select Status"
-            style={{ marginBottom: 10 }}
-            containerStyle={{ marginBottom: 10, zIndex: 3000 }}
-            dropDownContainerStyle={{ zIndex: 3000 }}
-          />
+            {/* Task Description Input */}
+            <TextInput
+              label="Task Description"
+              value={taskDesc}
+              mode="outlined"
+              multiline={true}
+              numberOfLines={4}
+              style={{ height: 100 }}
+              onChangeText={(text: string) => setTaskDesc(text)}
+              outlineColor="black"
+              activeOutlineColor="black"
+              className="mb-[10px]"
+            />
+            <View className="">
+              <Text className="font-bold text-[14px mt-[10px]">Due Date:</Text>
+            </View>
 
-          <View className="">
-            <Text className="font-bold text-[14px] mt-[10px]">Priority:</Text>
-          </View>
-          <DropDownPicker
-            open={priorityOpen}
-            value={priority}
-            items={priorityOptions}
-            setOpen={(open) => {
-              setPriorityOpen(open);
-              //   if (open) setStatusOpen(false); // Close other dropdown
-            }}
-            setValue={setPriority}
-            placeholder="Select Priority"
-            style={{ marginBottom: 10 }}
-            containerStyle={{ marginBottom: 10, zIndex: 2000 }}
-            dropDownContainerStyle={{ zIndex: 2000 }}
-          />
-
-          <View className="flex-row justify-around mt-[20px]">
             <TouchableOpacity
-              style={styles.saveButton}
-              onPress={() => {
-                onPressSave();
-              }}
+              onPress={() => setShowDatePicker(true)}
+              className="border border-black rounded-[5px] p-[10px] mb-[10px]"
             >
-              {indicatorVisible ? (
-                <ActivityIndicator size="small" />
-              ) : (
-                <Text style={styles.buttonText}>Save</Text>
-              )}
+              <Text className="text-gray-700">
+                {dueDate.toISOString().split("T")[0] || "Select Due Date"}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.cancelButton} onPress={closeModal}>
-              <Text style={styles.buttonText}>Cancel</Text>
-            </TouchableOpacity>
+            {showDatePicker && (
+              <DateTimePicker
+                value={dueDate}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  if (selectedDate) setDueDate(selectedDate);
+                }}
+              />
+            )}
+
+            <View className="">
+              <Text className="font-bold text-[14px mt-[10px]">Status:</Text>
+            </View>
+            <DropDownPicker
+              open={statusOpen}
+              value={status}
+              items={statusOptions}
+              setOpen={(open: boolean) => {
+                setStatusOpen(open);
+                if (open) setPriorityOpen(false); // Close other dropdown
+              }}
+              setValue={setStatus}
+              placeholder="Select Status"
+              style={{ marginBottom: 10 }}
+              containerStyle={{ marginBottom: 10, zIndex: 3000 }}
+              dropDownContainerStyle={{ zIndex: 3000 }}
+            />
+
+            <View className="">
+              <Text className="font-bold text-[14px] mt-[10px]">Priority:</Text>
+            </View>
+            <DropDownPicker
+              open={priorityOpen}
+              value={priority}
+              items={priorityOptions}
+              setOpen={(open) => {
+                setPriorityOpen(open);
+                //   if (open) setStatusOpen(false); // Close other dropdown
+              }}
+              setValue={setPriority}
+              placeholder="Select Priority"
+              style={{ marginBottom: 10 }}
+              containerStyle={{ marginBottom: 10, zIndex: 2000 }}
+              dropDownContainerStyle={{ zIndex: 2000 }}
+            />
+
+            <View className="flex-row justify-around mt-[20px]">
+              <TouchableOpacity
+                style={styles.saveButton}
+                onPress={() => {
+                  onPressSave();
+                }}
+              >
+                {indicatorVisible ? (
+                  <ActivityIndicator size="small" />
+                ) : (
+                  <Text style={styles.buttonText}>Save</Text>
+                )}
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={closeModal}
+              >
+                <Text style={styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
+    </ScrollView>
   );
 };
 
@@ -274,5 +308,10 @@ const styles = StyleSheet.create({
     color: "#fff",
     textAlign: "center",
     fontWeight: "bold",
+  },
+  errorText: {
+    color: "red",
+    fontSize: 12,
+    marginBottom: 10,
   },
 });

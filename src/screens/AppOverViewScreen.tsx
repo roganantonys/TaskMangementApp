@@ -13,7 +13,6 @@ type props = {};
 
 type AppOverViewScreen = NativeStackScreenProps<StackProps, "OnBoarding">;
 const AppOverViewScreen: React.FC<AppOverViewScreen> = ({ navigation }) => {
-  // const navigation = useNavigation();
   return (
     <>
       <View className="flex-1">

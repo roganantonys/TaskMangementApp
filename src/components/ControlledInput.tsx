@@ -48,7 +48,7 @@ const ControlledInput = ({
             activeOutlineColor={colors.primary}
             {...props}
           />
-          {error && <Text style={styles.errorText}>{error.message}</Text>}
+          {/* {error && <Text style={styles.errorText}>{error.message}</Text>} */}
         </View>
       </>
     )}

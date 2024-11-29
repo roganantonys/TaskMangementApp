@@ -8,6 +8,8 @@ import AgendaScreen from "../screens/AgendaScreen";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import ProfileScreen from "../screens/ProfileScreen";
+import { FontAwesome } from "@expo/vector-icons";
 
 type Props = {};
 
@@ -94,7 +96,7 @@ const BottomTabNavigation = (props: Props) => {
         }}
       />
       <Tab.Screen
-        name="Profile"
+        name="Agenda"
         component={AgendaScreen}
         options={{
           tabBarIcon: ({ focused }: { focused: boolean }) => (
@@ -113,6 +115,30 @@ const BottomTabNavigation = (props: Props) => {
               }}
             >
               Agenda
+            </Text>
+          ),
+        }}
+      />
+      <Tab.Screen
+        name="Profile"
+        component={ProfileScreen}
+        options={{
+          tabBarIcon: ({ focused }: { focused: boolean }) => (
+            <FontAwesome
+              name={focused ? "user" : "user-o"}
+              size={focused ? 26 : 24}
+              color={focused ? "#DEAA79" : "black"}
+            />
+          ),
+          tabBarLabel: ({ focused }: { focused: boolean }) => (
+            <Text
+              style={{
+                fontSize: focused ? 16 : 14,
+                fontWeight: focused ? "bold" : "normal",
+                color: focused ? "#DEAA79" : "gray",
+              }}
+            >
+              Profile
             </Text>
           ),
         }}
