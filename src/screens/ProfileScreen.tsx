@@ -5,6 +5,7 @@ import { signOut } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore"; // Firestore functions
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import Toast from "react-native-toast-message";
+import SaveCancelButton from "../components/SaveCancelButton";
 
 const ProfileScreen = () => {
   const [userData, setUserData] = useState({
@@ -99,12 +100,15 @@ const ProfileScreen = () => {
       </View>
 
       {/* Logout Button */}
-      <TouchableOpacity
+      {/* <TouchableOpacity
         className="bg-red-500 px-6 py-3 rounded-md w-3/4 items-center mt-5"
         onPress={handleLogout}
       >
         <Text className="text-white text-lg font-semibold">Log Out</Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
+      <SaveCancelButton variant="cancel" onPress={handleLogout} size="lg">
+        Log out
+      </SaveCancelButton>
     </View>
   );
 };

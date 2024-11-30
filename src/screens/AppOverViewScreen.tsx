@@ -1,22 +1,29 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
-import React from "react";
+import React, { useRef } from "react";
 import Swiper from "react-native-swiper";
 import SwiperComponent from "../components/SwiperComponent";
-import Button from "../components/Button";
+
 import { StatusBar } from "expo-status-bar";
 import { useNavigation } from "@react-navigation/native";
 import LoginScreen from "./LoginScreen";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { StackProps } from "../navigation/StackNavigation";
+import CustomButton from "../components/CustomButton";
 
 type props = {};
 
 type AppOverViewScreen = NativeStackScreenProps<StackProps, "OnBoarding">;
 const AppOverViewScreen: React.FC<AppOverViewScreen> = ({ navigation }) => {
+  const swiperRef = useRef(null);
   return (
     <>
       <View className="flex-1">
-        <Swiper loop={false} dotColor="#DEAA79" activeDotColor="#FFE6A9">
+        <Swiper
+          ref={swiperRef}
+          loop={false}
+          dotColor="#DEAA79"
+          activeDotColor="#FFE6A9"
+        >
           <SwiperComponent
             title="Create Tasks Effortlessly"
             description="Organize your tasks with ease."
@@ -34,8 +41,18 @@ const AppOverViewScreen: React.FC<AppOverViewScreen> = ({ navigation }) => {
           />
         </Swiper>
         <View className="bg-[#A1EEBD] flex-row justify-between">
-          <Button title="Skip" onPress={() => navigation.replace("Login")} />
-          <Button title="Next" onPress={() => console.log("Next")} />
+          <CustomButton
+            title="Skip"
+            size="md"
+            variant="primary"
+            onPress={() => navigation.replace("Login")}
+          />
+          <CustomButton
+            title="Next"
+            size="md"
+            variant="primary"
+            onPress={() => swiperRef.current.scrollBy(1)}
+          />
         </View>
       </View>
     </>

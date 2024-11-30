@@ -12,6 +12,7 @@ import { collection, addDoc } from "firebase/firestore";
 import { fireDB } from "../firebase";
 import Toast from "react-native-toast-message";
 import { z } from "zod";
+import SaveCancelButton from "./SaveCancelButton";
 
 type prop = {
   modalVisible: boolean;
@@ -158,8 +159,8 @@ const AgendaModal = ({ modalVisible, setModalVisible }: prop) => {
               />
             )}
 
-            <View className="flex-row justify-between w-full mt-5">
-              <TouchableOpacity
+            <View className="w-[100%] flex-row justify-between mt-5">
+              {/* <TouchableOpacity
                 className="flex-1 bg-green-500 p-3 rounded mr-2"
                 onPress={onSaveTask}
               >
@@ -174,7 +175,18 @@ const AgendaModal = ({ modalVisible, setModalVisible }: prop) => {
                 onPress={closeModal}
               >
                 <Text className="text-white text-center font-bold">Cancel</Text>
-              </TouchableOpacity>
+              </TouchableOpacity> */}
+              <SaveCancelButton
+                variant="save"
+                isLoading={indicatorVisible}
+                onPress={onSaveTask}
+                size="md"
+              >
+                Save
+              </SaveCancelButton>
+              <SaveCancelButton variant="cancel" size="md" onPress={closeModal}>
+                Cancel
+              </SaveCancelButton>
             </View>
           </View>
         </View>

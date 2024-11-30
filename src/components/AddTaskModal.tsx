@@ -27,6 +27,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { FontAwesome } from "@expo/vector-icons";
+import SaveCancelButton from "./SaveCancelButton";
+import { ButtonStyle } from "../utils/ButtonStyle";
 
 type TaskItem = {
   id: string;
@@ -44,7 +46,10 @@ type Props = {
 };
 
 const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
+  console.log(ButtonStyle({ height: "medium", width: "medium" }));
+
   console.log("add task modal clikced:", item);
+
   const [taskTitle, setTaskTitle] = useState(item?.title || "");
   const [taskDesc, setTaskDesc] = useState(item?.description || "");
   const [dueDate, setDueDate] = useState(
@@ -248,25 +253,26 @@ const AddTaskModal = ({ modalVisible, setModalVisible, item }: Props) => {
               dropDownContainerStyle={{ zIndex: 2000 }}
             />
 
-            <View className="flex-row justify-around mt-[20px]">
-              <TouchableOpacity
-                className="bg-[#4CAF50] p-2 rounded-md flex-1 mr-2"
-                onPress={() => {
-                  onPressSave();
-                }}
+            <View className="w-[100%] flex-row justify-around mt-[20px]">
+              <SaveCancelButton
+                variant="save"
+                isLoading={indicatorVisible}
+                onPress={onPressSave}
+                size="md"
+                // width="medium"
+                // height="medium"
               >
-                {indicatorVisible ? (
-                  <ActivityIndicator size="small" />
-                ) : (
-                  <Text className="text-white text-center font-bold">Save</Text>
-                )}
-              </TouchableOpacity>
-              <TouchableOpacity
-                className="bg-[#f44336] p-2 rounded-md flex-1"
+                Save
+              </SaveCancelButton>
+              <SaveCancelButton
+                variant="cancel"
+                size="md"
                 onPress={closeModal}
+                // width="medium"
+                // height="medium"
               >
-                <Text className="text-white text-center font-bold">Cancel</Text>
-              </TouchableOpacity>
+                Cancel
+              </SaveCancelButton>
             </View>
           </View>
         </View>

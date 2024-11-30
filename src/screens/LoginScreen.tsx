@@ -20,6 +20,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontAwesome } from "@expo/vector-icons";
+import CustomButton from "../components/CustomButton";
+import SaveCancelButton from "../components/SaveCancelButton";
 
 // Define color palette
 const colors = {
@@ -177,13 +179,24 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ navigation }) => {
           {errors.password && (
             <Text style={styles.errorText}>{errors.password.message}</Text>
           )}
-          <Pressable onPress={handleSubmit(handleLogin)} style={styles.button}>
+          {/* <Pressable onPress={handleSubmit(handleLogin)} style={styles.button}>
             {indicatorVisible ? (
               <ActivityIndicator size="small" />
             ) : (
               <Text style={styles.buttonText}>Login</Text>
             )}
-          </Pressable>
+          </Pressable> */}
+
+          <SaveCancelButton
+            variant="loginSize"
+            isLoading={indicatorVisible}
+            onPress={handleSubmit(handleLogin)}
+            size="login"
+            height="large"
+          >
+            Log in
+          </SaveCancelButton>
+
           <Button
             mode="text"
             onPress={() => console.log("Forgot Password Pressed")}

@@ -19,6 +19,7 @@ import Toast from "react-native-toast-message";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FontAwesome, MaterialIcons } from "@expo/vector-icons";
+import SaveCancelButton from "../components/SaveCancelButton";
 // Define color palette
 const colors = {
   primary: "#659287", // Main accent color
@@ -149,13 +150,21 @@ const SignUpScreen: React.FC<SignUpScreenProps> = ({ navigation }) => {
           {errors.password && (
             <Text style={styles.errorText}>{errors.password.message}</Text>
           )}
-          <Pressable onPress={handleSubmit(handleSignUp)} style={styles.button}>
+          {/* <Pressable onPress={handleSubmit(handleSignUp)} style={styles.button}>
             {indicatorVisible ? (
               <ActivityIndicator size="small" />
             ) : (
               <Text style={styles.buttonText}>SignUp</Text>
             )}
-          </Pressable>
+          </Pressable> */}
+          <SaveCancelButton
+            variant="loginSize"
+            isLoading={indicatorVisible}
+            onPress={handleSubmit(handleSignUp)}
+            size="login"
+          >
+            Sign up
+          </SaveCancelButton>
           <Button
             mode="text"
             onPress={() => navigation.navigate("Login")} // Navigate back to login
